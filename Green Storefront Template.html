@@ -1,0 +1,362 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Green Storefront Template</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky black header, hash-routed views (home, shop, product, cart, about, faq, contact), 4-col product grid collapsing to 1 */
+:root{
+  --black:#0a0d0b; --panel:#111612; --line:#1f2a22; --muted:#8a9a8f; --text:#eef3ef;
+  --green:#2fa865; --green-deep:#16492f; --green-soft:#0f2219;
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --body:"Instrument Sans",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--black);color:var(--text);font:16px/1.6 var(--body)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--black)}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.08}
+.label{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
+
+/* header */
+.bar{background:var(--green-deep);font:500 12px/1 var(--mono);letter-spacing:.06em;text-align:center}
+.bar .wrap{padding-block:9px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--black) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;gap:24px;padding-block:16px;flex-wrap:wrap}
+.logo{font:800 22px/1 var(--display);display:flex;align-items:center;gap:10px;letter-spacing:-.01em}
+.logo i{width:22px;height:22px;border-radius:50% 50% 50% 0;background:var(--green);display:block;transform:rotate(-45deg)}
+nav{display:flex;gap:22px;flex-wrap:wrap;margin-left:auto;align-items:center}
+nav a{font-weight:500;color:var(--muted);transition:color .15s}
+nav a:hover,nav a.on{color:var(--text)}
+.cartlink{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:7px 14px;color:var(--text)!important}
+.cartlink b{background:var(--green);color:var(--black);font:600 12px/1 var(--mono);border-radius:999px;padding:4px 7px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:6px;padding:13px 22px;font-weight:600;background:var(--green);color:var(--black);transition:filter .15s}
+.btn:hover{filter:brightness(1.1)}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--green)}
+
+main{min-height:60vh}
+section{padding-block:72px}
+
+/* hero */
+.hero{border-bottom:1px solid var(--line);background:radial-gradient(900px 400px at 85% 0%,var(--green-soft),transparent 70%)}
+.hero .wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:center;padding-block:80px}
+.hero h1{font-size:clamp(40px,6.4vw,76px);font-weight:800;letter-spacing:-.025em;margin:18px 0 20px}
+.hero h1 em{font-style:normal;color:var(--green)}
+.hero p{color:var(--muted);max-width:52ch;font-size:18px;margin:0 0 30px}
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap}
+.heroart{aspect-ratio:1;max-width:100%;border:1px solid var(--line);border-radius:14px;background:
+  repeating-linear-gradient(135deg,transparent 0 18px,rgba(47,168,101,.06) 18px 19px),var(--panel);display:grid;place-items:center;color:var(--muted);font:500 13px var(--mono);text-align:center;padding:20px}
+
+.trust{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border-block:1px solid var(--line)}
+.trust div{background:var(--black);padding:22px 20px}
+.trust strong{display:block;font-family:var(--display);font-size:17px}
+.trust span{color:var(--muted);font-size:14px}
+
+.sechead{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:32px}
+.sechead h2{font-size:clamp(28px,3.6vw,40px);margin-top:10px}
+
+/* product grid */
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.card{display:flex;flex-direction:column;gap:12px;color:inherit}
+.thumb{aspect-ratio:4/5;max-width:100%;border:1px dashed #2d3c31;border-radius:10px;background:var(--panel);display:grid;place-items:center;color:#4c5e51;font:500 12px var(--mono);letter-spacing:.08em;transition:border-color .15s}
+.card:hover .thumb{border-color:var(--green)}
+.ph{background:#1a231d;border-radius:4px;height:12px}
+.card .meta{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.card h3{font:600 16px/1.3 var(--body);color:#6f8174}
+.price{font:500 14px var(--mono);color:#6f8174;font-variant-numeric:tabular-nums}
+.sku{font:400 11px var(--mono);color:#4c5e51;letter-spacing:.06em}
+
+/* filters */
+.shoplayout{display:grid;grid-template-columns:220px 1fr;gap:40px}
+.filters{display:flex;flex-direction:column;gap:26px}
+.filters h4{margin:0 0 10px;font:500 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:none;color:var(--text);font-size:14px}
+.chip.on{background:var(--green);border-color:var(--green);color:var(--black)}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px;color:var(--muted);font-size:14px;flex-wrap:wrap}
+select{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:8px 12px;font:inherit}
+
+/* product page */
+.pdp{display:grid;grid-template-columns:1.1fr 1fr;gap:56px}
+.gallery{display:grid;gap:12px}
+.gallery .main{aspect-ratio:1;max-width:100%}
+.gallery .thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.gallery .thumbs .thumb{aspect-ratio:1}
+.crumbs{font:400 13px var(--mono);color:var(--muted);margin-bottom:18px}
+.pinfo{display:flex;flex-direction:column;gap:20px;min-width:0}
+.pinfo h1{font-size:clamp(30px,4vw,44px);color:#6f8174}
+.slot{border:1px dashed #2d3c31;border-radius:8px;padding:14px 16px;color:#5d7062;font-size:14px}
+.slot b{display:block;font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:6px}
+.opts{display:flex;gap:8px;flex-wrap:wrap}
+.qty{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.qty button{background:var(--panel);color:var(--text);border:0;width:42px;height:46px;font-size:18px}
+.qty output{width:48px;display:grid;place-items:center;font-family:var(--mono)}
+.buyrow{display:flex;gap:12px;flex-wrap:wrap}
+.specs{width:100%;border-collapse:collapse;font-size:14px}
+.specs td{border-top:1px solid var(--line);padding:12px 0;color:#5d7062}
+.specs td:first-child{color:var(--muted);width:40%}
+
+/* cart */
+.cartwrap{display:grid;grid-template-columns:1fr 340px;gap:40px;align-items:start}
+.line{display:grid;grid-template-columns:80px 1fr auto;gap:16px;align-items:center;padding-block:16px;border-bottom:1px solid var(--line)}
+.line .thumb{aspect-ratio:1}
+.summary{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:24px;display:flex;flex-direction:column;gap:14px}
+.summary .row{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+.summary .row.total{border-top:1px solid var(--line);padding-top:14px;font-weight:600;font-size:18px}
+.empty{border:1px dashed var(--line);border-radius:10px;padding:48px 24px;text-align:center;color:var(--muted)}
+.empty .btn{margin-top:18px}
+
+/* text pages */
+.prose{max-width:66ch}
+.prose h1{font-size:clamp(34px,5vw,54px);margin:12px 0 22px}
+.prose p{color:var(--muted)}
+details{border-bottom:1px solid var(--line);padding-block:18px}
+summary{cursor:pointer;font-weight:600;font-size:17px;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::after{content:"+";color:var(--green);font-family:var(--mono)}
+details[open] summary::after{content:"−"}
+details p{color:var(--muted);margin:10px 0 0}
+form{display:grid;gap:16px;max-width:560px;margin-top:28px}
+label{display:grid;gap:6px;font-size:14px;color:var(--muted)}
+input,textarea{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 14px;color:var(--text);font:inherit}
+input:focus,textarea:focus{border-color:var(--green);outline:none}
+.sent{color:var(--green);font-weight:500}
+
+/* newsletter + footer */
+.news{background:var(--green-deep)}
+.news .wrap{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;padding-block:44px}
+.news h2{font-size:28px}
+.news form{display:flex;gap:10px;margin:0;max-width:none;flex-wrap:wrap}
+.news input{background:var(--black);min-width:0;width:260px;max-width:100%}
+.news .btn{background:var(--black);color:var(--text)}
+footer .wrap{display:grid;grid-template-columns:2fr repeat(3,1fr);gap:32px;padding-block:56px 32px}
+footer h4{margin:0 0 12px;font:500 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+footer ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;color:var(--muted);font-size:14px}
+footer ul a:hover{color:var(--text)}
+.legal{grid-column:1/-1;border-top:1px solid var(--line);padding-top:20px;color:#5d7062;font-size:13px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+.toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));right:max(20px,env(safe-area-inset-right,0px));background:var(--green);color:var(--black);padding:12px 18px;border-radius:8px;font-weight:600;z-index:20}
+
+@media (max-width:960px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero .wrap,.pdp,.cartwrap,.shoplayout{grid-template-columns:1fr}
+  .trust{grid-template-columns:repeat(2,1fr)}
+  footer .wrap{grid-template-columns:1fr 1fr}
+}
+@media (max-width:520px){
+  .grid{grid-template-columns:1fr 1fr;gap:14px}
+  nav{margin-left:0;width:100%;gap:16px}
+  section{padding-block:48px}
+  .heroart{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="bar"><div class="wrap">Free shipping on orders over $XX · Edit this announcement</div></div>
+<header>
+  <div class="wrap">
+    <a class="logo" href="#home"><i></i>Your Brand</a>
+    <nav>
+      <a href="#shop" data-r="shop">Shop</a>
+      <a href="#about" data-r="about">About</a>
+      <a href="#faq" data-r="faq">FAQ</a>
+      <a href="#contact" data-r="contact">Contact</a>
+      <a href="#cart" class="cartlink">Cart <b id="count">0</b></a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- HOME -->
+  <div data-view="home">
+    <div class="hero"><div class="wrap">
+      <div>
+        <span class="label">New collection</span>
+        <h1>Your headline goes <em>right here.</em></h1>
+        <p>A short line about what you sell and why it's worth buying. Keep it to one or two sentences.</p>
+        <div class="ctas"><a class="btn" href="#shop">Shop all products</a><a class="btn ghost" href="#about">Our story</a></div>
+      </div>
+      <div class="heroart">HERO IMAGE<br>1200 × 1200</div>
+    </div></div>
+    <div class="trust">
+      <div><strong>Fast shipping</strong><span>Ships in 1–2 business days</span></div>
+      <div><strong>Secure checkout</strong><span>Encrypted payments</span></div>
+      <div><strong>Quality tested</strong><span>Add your guarantee here</span></div>
+      <div><strong>Real support</strong><span>Replies within 24 hours</span></div>
+    </div>
+    <section><div class="wrap">
+      <div class="sechead"><div><span class="label">Featured</span><h2>Best sellers</h2></div><a class="btn ghost" href="#shop">View all</a></div>
+      <div class="grid" id="featured"></div>
+    </div></section>
+  </div>
+
+  <!-- SHOP -->
+  <div data-view="shop" hidden>
+    <section><div class="wrap">
+      <div class="sechead"><div><span class="label">Catalog</span><h2>All products</h2></div></div>
+      <div class="shoplayout">
+        <aside class="filters">
+          <div><h4>Category</h4><div class="chips" id="cats"></div></div>
+          <div><h4>Price</h4><div class="chips"><button class="chip">Under $50</button><button class="chip">$50–$100</button><button class="chip">$100+</button></div></div>
+        </aside>
+        <div>
+          <div class="toolbar"><span>12 product slots</span>
+            <label style="display:flex;align-items:center;gap:8px">Sort <select id="sort"><option>Featured</option><option>Price: low to high</option><option>Price: high to low</option><option>Newest</option></select></label>
+          </div>
+          <div class="grid" id="shopgrid"></div>
+        </div>
+      </div>
+    </div></section>
+  </div>
+
+  <!-- PRODUCT TEMPLATE -->
+  <div data-view="product" hidden>
+    <section><div class="wrap">
+      <div class="crumbs"><a href="#home">Home</a> / <a href="#shop">Shop</a> / <span id="pcrumb">Product</span></div>
+      <div class="pdp">
+        <div class="gallery">
+          <div class="thumb main">MAIN PRODUCT IMAGE</div>
+          <div class="thumbs"><div class="thumb">IMG 2</div><div class="thumb">IMG 3</div><div class="thumb">IMG 4</div><div class="thumb">IMG 5</div></div>
+        </div>
+        <div class="pinfo">
+          <div><span class="sku" id="psku">SKU-0000</span><h1 id="pname">Product name</h1></div>
+          <div class="price" style="font-size:22px">$0.00</div>
+          <div class="slot"><b>Short description</b>One or two sentences summarizing the product.</div>
+          <div><h4 class="label" style="margin:0 0 10px">Size / variant</h4>
+            <div class="opts"><button class="chip on">Option 1</button><button class="chip">Option 2</button><button class="chip">Option 3</button></div></div>
+          <div class="buyrow">
+            <div class="qty"><button id="minus" aria-label="Decrease quantity">−</button><output id="q">1</output><button id="plus" aria-label="Increase quantity">+</button></div>
+            <button class="btn" id="add" style="flex:1">Add to cart</button>
+          </div>
+          <div class="slot"><b>Full description</b>Details, use cases, what's included.</div>
+          <table class="specs">
+            <tr><td>Specification 1</td><td>—</td></tr>
+            <tr><td>Specification 2</td><td>—</td></tr>
+            <tr><td>Specification 3</td><td>—</td></tr>
+            <tr><td>Shipping</td><td>—</td></tr>
+          </table>
+        </div>
+      </div>
+    </div></section>
+    <section style="padding-top:0"><div class="wrap">
+      <div class="sechead"><div><span class="label">More</span><h2>You might also like</h2></div></div>
+      <div class="grid" id="related"></div>
+    </div></section>
+  </div>
+
+  <!-- CART -->
+  <div data-view="cart" hidden>
+    <section><div class="wrap">
+      <div class="sechead"><div><span class="label">Checkout</span><h2>Your cart</h2></div></div>
+      <div class="cartwrap">
+        <div id="lines"></div>
+        <aside class="summary">
+          <div class="row"><span>Subtotal</span><span>$0.00</span></div>
+          <div class="row"><span>Shipping</span><span>Calculated at checkout</span></div>
+          <div class="row total"><span>Total</span><span>$0.00</span></div>
+          <button class="btn" id="checkout">Checkout</button>
+          <p id="checkoutnote" class="sent" hidden style="margin:0;font-size:14px">Connect a payment provider to turn this on.</p>
+        </aside>
+      </div>
+    </div></section>
+  </div>
+
+  <!-- ABOUT -->
+  <div data-view="about" hidden>
+    <section><div class="wrap prose">
+      <span class="label">About</span>
+      <h1>Who we are</h1>
+      <p>Tell your story here: how the business started, what you care about, and what makes your products different.</p>
+      <p>Add a second paragraph about your standards, sourcing, or the people behind the brand.</p>
+    </div></section>
+  </div>
+
+  <!-- FAQ -->
+  <div data-view="faq" hidden>
+    <section><div class="wrap prose">
+      <span class="label">Help</span>
+      <h1>Frequently asked questions</h1>
+      <details open><summary>How long does shipping take?</summary><p>Add your shipping times and carriers here.</p></details>
+      <details><summary>What is your return policy?</summary><p>Describe your return window and conditions.</p></details>
+      <details><summary>Which payment methods do you accept?</summary><p>List the payment methods your store supports.</p></details>
+      <details><summary>How do I track my order?</summary><p>Explain where customers find tracking info.</p></details>
+    </div></section>
+  </div>
+
+  <!-- CONTACT -->
+  <div data-view="contact" hidden>
+    <section><div class="wrap prose">
+      <span class="label">Contact</span>
+      <h1>Get in touch</h1>
+      <p>Questions about an order or a product? Send a message and we'll reply within one business day.</p>
+      <form id="cform">
+        <label for="cname">Name<input id="cname" required></label>
+        <label for="cemail">Email<input id="cemail" type="email" required></label>
+        <label for="cmsg">Message<textarea id="cmsg" rows="5" required></textarea></label>
+        <button class="btn" type="submit">Send message</button>
+        <p class="sent" id="csent" hidden>Thanks. This form is a template; connect it to your email or backend to receive messages.</p>
+      </form>
+    </div></section>
+  </div>
+</main>
+
+<div class="news"><div class="wrap">
+  <div><span class="label" style="color:var(--text);opacity:.7">Newsletter</span><h2 style="margin-top:8px">Get new drops first</h2></div>
+  <form id="nform"><input id="nemail" type="email" placeholder="you@email.com" required aria-label="Email address"><button class="btn" type="submit">Subscribe</button></form>
+</div></div>
+<footer><div class="wrap">
+  <div><a class="logo" href="#home"><i></i>Your Brand</a><p style="color:var(--muted);font-size:14px;max-width:34ch">One line describing your store.</p></div>
+  <div><h4>Shop</h4><ul><li><a href="#shop">All products</a></li><li><a href="#shop">Category one</a></li><li><a href="#shop">Category two</a></li></ul></div>
+  <div><h4>Help</h4><ul><li><a href="#faq">FAQ</a></li><li><a href="#faq">Shipping</a></li><li><a href="#faq">Returns</a></li></ul></div>
+  <div><h4>Company</h4><ul><li><a href="#about">About</a></li><li><a href="#contact">Contact</a></li><li><a href="#faq">Terms &amp; privacy</a></li></ul></div>
+  <div class="legal"><span>© 2026 Your Brand. All rights reserved.</span><span>Add policy links here</span></div>
+</div></footer>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const $=s=>document.querySelector(s);
+let cart=0, qty=1, current=1;
+const card=n=>`<a class="card" href="#product" data-p="${n}">
+  <div class="thumb">PRODUCT IMAGE</div>
+  <span class="sku">SKU-${String(n).padStart(4,"0")}</span>
+  <div class="meta"><h3>Product name</h3><span class="price">$0.00</span></div>
+  <div class="ph" style="width:60%"></div></a>`;
+const fill=(id,from,count)=>{$(id).innerHTML=Array.from({length:count},(_,i)=>card(from+i)).join("")};
+fill("#featured",1,4); fill("#shopgrid",1,12); fill("#related",5,4);
+$("#cats").innerHTML=["All","Category 1","Category 2","Category 3"].map((c,i)=>`<button class="chip${i?"":" on"}">${c}</button>`).join("");
+document.addEventListener("click",e=>{
+  const p=e.target.closest("[data-p]"); if(p){current=+p.dataset.p}
+  const c=e.target.closest(".chip"); if(c){c.parentElement.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));c.classList.add("on")}
+});
+function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,1800)}
+$("#plus").onclick=()=>{qty++;$("#q").value=qty;$("#q").textContent=qty};
+$("#minus").onclick=()=>{qty=Math.max(1,qty-1);$("#q").textContent=qty};
+$("#add").onclick=()=>{cart+=qty;$("#count").textContent=cart;toast(`Added ${qty} to cart`)};
+$("#checkout").onclick=()=>{$("#checkoutnote").hidden=false};
+$("#cform").onsubmit=e=>{e.preventDefault();$("#csent").hidden=false};
+$("#nform").onsubmit=e=>{e.preventDefault();toast("Subscribed");e.target.reset()};
+function renderCart(){
+  $("#lines").innerHTML=cart?`<div class="line"><div class="thumb">IMG</div><div><span class="sku">SKU-0000</span><div style="color:#6f8174;font-weight:600">Product name</div></div><span class="price">Qty ${cart} · $0.00</span></div>`
+  :`<div class="empty">Your cart is empty.<br><a class="btn" href="#shop">Browse products</a></div>`;
+}
+function route(){
+  const r=(location.hash||"#home").slice(1);
+  const v=document.querySelector(`[data-view="${r}"]`)?r:"home";
+  document.querySelectorAll("[data-view]").forEach(el=>el.hidden=el.dataset.view!==v);
+  document.querySelectorAll("nav [data-r]").forEach(a=>a.classList.toggle("on",a.dataset.r===v));
+  if(v==="product"){const s="SKU-"+String(current).padStart(4,"0");$("#psku").textContent=s;$("#pcrumb").textContent="Product "+current;qty=1;$("#q").textContent=1}
+  if(v==="cart")renderCart();
+  window.scrollTo(0,0);
+}
+addEventListener("hashchange",route); route();
+</script>
+
+</body></html>
