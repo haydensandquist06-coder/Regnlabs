@@ -2328,7 +2328,7 @@ service cloud.firestore {
     const inp = (name, label, o = {}) => `<label class="${o.full ? 'full' : ''}">${esc(label)}<input name="${name}" data-co="${name}" value="${esc(d[name] || '')}" ${o.req === false ? '' : 'required'} ${o.type ? `type="${o.type}"` : ''} ${o.ac ? `autocomplete="${o.ac}"` : ''} ${o.pattern ? `pattern="${o.pattern}"` : ''} ${o.ph ? `placeholder="${esc(o.ph)}"` : 'placeholder=" "'} maxlength="${o.max || 120}"></label>`;
     el.innerHTML = `
       <div class="sechead"><div><span class="label">${esc(C.eyebrow)}</span><h2>${esc(C.title)}</h2></div></div>
-      <form class="co" id="coForm" action="https://formsubmit.co/${esc(String(C.formEmail).trim().replace(/[\s/?#\\]/g, ''))}" method="POST" enctype="multipart/form-data" novalidate>
+      <form class="co" id="coForm" action="/api/order" method="POST" enctype="multipart/form-data" novalidate>
         <div class="co-main">
           <div class="co-block"><h2><span class="n">1</span>${esc(C.contactTitle)}</h2>
             <div class="co-fields">${inp('name', 'Full name', { ac: 'name', full: true })}${inp('email', 'Email', { type: 'email', ac: 'email' })}${inp('phone', 'Phone (optional)', { type: 'tel', ac: 'tel', req: false })}</div>
