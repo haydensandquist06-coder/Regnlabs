@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Orders · REGN Labs</title>
+<style>
+  :root { --bg:#0b0b0b; --panel:#141414; --line:#262626; --ink:#ededed; --muted:#8a8a8a; --green:#22c55e; --green-dim:#14532d; --red:#ef4444; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  header h1 { margin:0; font-size:18px; } header h1 b { color:var(--green); }
+  main { max-width:1100px; margin:0 auto; padding:16px; }
+  input, select, textarea, button { font:inherit; color:var(--ink); background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:8px 10px; }
+  button { cursor:pointer; } button.primary { background:var(--green); color:#04150a; border-color:var(--green); font-weight:600; }
+  .login { max-width:380px; margin:12vh auto; display:grid; gap:10px; }
+  .bar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+  .bar .count { color:var(--muted); margin-right:auto; }
+  .order { background:var(--panel); border:1px solid var(--line); border-radius:10px; margin-bottom:10px; overflow:hidden; }
+  .order summary { list-style:none; cursor:pointer; display:grid; grid-template-columns:150px 1fr auto auto; gap:12px; align-items:center; padding:12px 14px; }
+  .order summary::-webkit-details-marker { display:none; }
+  .id { font-family:ui-monospace,Menlo,monospace; color:var(--green); }
+  .who { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .when { color:var(--muted); font-size:13px; white-space:nowrap; }
+  .status { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; padding:3px 8px; border-radius:999px; background:#262626; }
+  .status.new { background:var(--green); color:#04150a; } .status.shipped,.status.completed { background:var(--green-dim); color:#bbf7d0; } .status.cancelled { background:#3f1212; color:#fecaca; }
+  .body { padding:0 14px 14px; border-top:1px solid var(--line); }
+  table { width:100%; border-collapse:collapse; margin:12px 0; } td { padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; white-space:pre-wrap; overflow-wrap:anywhere; }
+  td:first-child { color:var(--muted); width:30%; white-space:normal; }
+  .edit { display:grid; grid-template-columns:180px 1fr auto; gap:8px; }
+  .msg { color:var(--muted); } .err { color:var(--red); }
+  @media (max-width:640px) { .order summary { grid-template-columns:1fr auto; } .who { grid-column:1/-1; order:3; } .edit { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<header><h1><b>REGN</b> Labs · Orders</h1><button id="logout" hidden>Lock</button></header>
+<main id="app"></main>
+<script>
+(() => {
+  const app = document.getElementById('app');
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  const STATUSES = ['new','paid','processing','shipped','completed','cancelled'];
+  let key = ''; try { key = sessionStorage.getItem('regn_admin_key') || ''; } catch {}
+  let filter = 'all', offset = 0, data = null;
+
+  async function api(method, body) {
+    const r = await fetch('/api/orders' + (method === 'GET' ? `?limit=100&offset=${offset}` : ''), {
+      method, headers: { Authorization: 'Bearer ' + key, ...(body ? { 'Content-Type': 'application/json' } : {}) },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const j = await r.json().catch(() => ({ ok: false, error: 'Bad response' }));
+    if (r.status === 401) { lock(j.error); throw new Error(j.error); }
+    if (!j.ok) throw new Error(j.error || 'Request failed');
+    return j;
+  }
+  function lock(msg) {
+    key = ''; try { sessionStorage.removeItem('regn_admin_key'); } catch {}
+    document.getElementById('logout').hidden = true;
+    app.innerHTML = `<form class="login"><h2>Enter admin key</h2>
+      <input type="password" name="k" autocomplete="current-password" required autofocus placeholder="ADMIN_KEY from Vercel">
+      <button class="primary">Unlock</button>${msg ? `<p class="err">${esc(msg)}</p>` : ''}</form>`;
+    app.querySelector('form').onsubmit = (e) => { e.preventDefault(); key = e.target.k.value.trim(); try { sessionStorage.setItem('regn_admin_key', key); } catch {} load(); };
+  }
+  async function load() {
+    app.innerHTML = '<p class="msg">Loading orders…</p>';
+    try { data = await api('GET'); document.getElementById('logout').hidden = false; render(); }
+    catch (e) { if (key) app.innerHTML = `<p class="err">${esc(e.message)}</p>`; }
+  }
+  function render() {
+    const list = data.orders.filter((o) => filter === 'all' || o.status === filter);
+    app.innerHTML = `<div class="bar"><span class="count">${data.total} order${data.total === 1 ? '' : 's'} total</span>
+      <select id="f"><option value="all">All statuses</option>${STATUSES.map((s) => `<option ${s === filter ? 'selected' : ''}>${s}</option>`).join('')}</select>
+      <button id="r">Refresh</button></div>
+      ${list.length ? list.map(card).join('') : '<p class="msg">No orders here yet.</p>'}
+      <div class="bar">${offset > 0 ? '<button id="prev">← Newer</button>' : ''}${offset + 100 < data.total ? '<button id="next">Older →</button>' : ''}</div>`;
+    app.querySelector('#f').onchange = (e) => { filter = e.target.value; render(); };
+    app.querySelector('#r').onclick = load;
+    app.querySelector('#prev')?.addEventListener('click', () => { offset -= 100; load(); });
+    app.querySelector('#next')?.addEventListener('click', () => { offset += 100; load(); });
+    app.querySelectorAll('form.edit').forEach((f) => f.onsubmit = save);
+  }
+  function card(o) {
+    const name = o.fields.name || o.fields.Name || o.fields.full_name || o.customerEmail || '(no name)';
+    return `<details class="order"><summary>
+      <span class="id">${esc(o.id)}</span><span class="who">${esc(name)}${o.customerEmail && o.customerEmail !== name ? ` · <span class="msg">${esc(o.customerEmail)}</span>` : ''}</span>
+      <span class="when">${esc(new Date(o.createdAt).toLocaleString())}</span><span class="status ${esc(o.status)}">${esc(o.status)}</span></summary>
+      <div class="body"><table>${Object.entries(o.fields).map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</table>
+      <form class="edit" data-id="${esc(o.id)}">
+        <select name="status">${STATUSES.map((s) => `<option ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}</select>
+        <input name="note" placeholder="Note (tracking number, etc.)" value="${esc(o.note || '')}">
+        <button class="primary">Save</button></form></div></details>`;
+  }
+  async function save(e) {
+    e.preventDefault(); const f = e.target, b = f.querySelector('button'); b.disabled = true; b.textContent = 'Saving…';
+    try {
+      const { order } = await api('POST', { id: f.dataset.id, status: f.status.value, note: f.note.value });
+      data.orders = data.orders.map((o) => (o.id === order.id ? order : o)); render();
+    } catch (err) { b.disabled = false; b.textContent = 'Save'; alert(err.message); }
+  }
+  document.getElementById('logout').onclick = () => lock();
+  key ? load() : lock();
+})();
+</script>
+</body>
+</html>
